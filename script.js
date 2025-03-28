@@ -36,6 +36,29 @@ function calculateTotal() {
     document.getElementById('total').innerText = `Total: $${total.toFixed(2)}`;
 }
 
+function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.text("Presupuesto", 10, 10);
+    let y = 20;
+
+    items.forEach((item, index) => {
+        const qty = document.querySelectorAll('.qty')[index].value || 0;
+        const price = document.querySelectorAll('.price')[index].value || 0;
+        doc.text(`${item}: Cantidad: ${qty}, Precio: ${price}`, 10, y);
+        y += 10;
+    });
+
+    const taxRate = document.getElementById('tax').value || 0;
+    const total = document.getElementById('total').innerText;
+    doc.text(`Impuestos: ${taxRate}%`, 10, y);
+    y += 10;
+    doc.text(total, 10, y);
+
+    doc.save("presupuesto.pdf");
+}
+
 // Registrar el Service Worker
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/service-worker.js')
