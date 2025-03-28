@@ -56,7 +56,7 @@ function downloadPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    // Información del cliente con tamaño de fuente ajustado
+    // Información del cliente y del vendedor con el mismo tamaño de fuente
     doc.setFontSize(10);
     const clientName = document.getElementById('client-name').value || 'Nombre del Cliente';
     const clientCity = document.getElementById('client-city').value || 'Ciudad';
@@ -69,7 +69,6 @@ function downloadPDF() {
     doc.text(`Teléfono: ${clientPhone}`, 10, 30);
     doc.text(`Email: ${clientEmail}`, 10, 35);
 
-    // Información del vendedor con el mismo tamaño de fuente
     doc.text("RICHY ENTERTAINMENT S.A.S. DE C.V.", 150, 10);
     doc.text("CDMX", 150, 15);
     doc.text("52 55 7341 3969", 150, 20);
