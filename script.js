@@ -7,16 +7,29 @@ const items = [
 ];
 
 const itemsContainer = document.querySelector('#items tbody');
+const itemSelect = document.getElementById('item-select');
 
+// Llenar el menú desplegable con los conceptos
 items.forEach(item => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-        <td>${item}</td>
-        <td><input type="number" placeholder="Cantidad" class="qty"></td>
-        <td><input type="number" placeholder="Precio" class="price"></td>
-    `;
-    itemsContainer.appendChild(row);
+    const option = document.createElement('option');
+    option.value = item;
+    option.textContent = item;
+    itemSelect.appendChild(option);
 });
+
+function addItem() {
+    const selectedItem = itemSelect.value;
+    if (selectedItem) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${selectedItem}</td>
+            <td><input type="number" placeholder="Cantidad" class="qty"></td>
+            <td><input type="number" placeholder="Precio" class="price"></td>
+        `;
+        itemsContainer.appendChild(row);
+        itemSelect.value = ''; // Resetear el menú desplegable
+    }
+}
 
 function calculateTotal() {
     let total = 0;
@@ -53,17 +66,23 @@ function downloadPDF() {
 
     let y = 60;
 
+    const tableData = [];
+    const rows = document.querySelectorAll('#items tbody tr');
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        const concept = cells[0].textContent;
+        const qty = cells[1].querySelector('input').value || 0;
+        const price = cells[2].querySelector('input').value || 0;
+        tableData.push([concept, qty, price]);
+    });
+
     doc.autoTable({
         head: [['Concepto', 'Cantidad', 'Precio']],
-        body: items.map((item, index) => {
-            const qty = document.querySelectorAll('.qty')[index].value || 0;
-            const price = document.querySelectorAll('.price')[index].value || 0;
-            return [item, qty, price];
-        }),
+        body: tableData,
         startY: y
     });
 
-    y += items.length * 10 + 10;
+    y += tableData.length * 10 + 10;
     const taxRate = document.getElementById('tax').value || 0;
     const total = document.getElementById('total').innerText;
     doc.text(`Impuestos: ${taxRate}%`, 10, y);
