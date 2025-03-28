@@ -6,17 +6,16 @@ const items = [
     "SUBURBAN LINEA ANTIGUA", "TOYOTA HIENCE", "TRAMO CARRETERO", "VAN DE CARGA", "VIATICOS"
 ];
 
-const itemsContainer = document.getElementById('items');
+const itemsContainer = document.querySelector('#items tbody');
 
 items.forEach(item => {
-    const itemDiv = document.createElement('div');
-    itemDiv.className = 'item';
-    itemDiv.innerHTML = `
-        <label>${item}</label>
-        <input type="number" placeholder="Cantidad" class="qty">
-        <input type="number" placeholder="Precio" class="price">
+    const row = document.createElement('tr');
+    row.innerHTML = `
+        <td>${item}</td>
+        <td><input type="number" placeholder="Cantidad" class="qty"></td>
+        <td><input type="number" placeholder="Precio" class="price"></td>
     `;
-    itemsContainer.appendChild(itemDiv);
+    itemsContainer.appendChild(row);
 });
 
 function calculateTotal() {
@@ -43,13 +42,17 @@ function downloadPDF() {
     doc.text("Presupuesto", 10, 10);
     let y = 20;
 
-    items.forEach((item, index) => {
-        const qty = document.querySelectorAll('.qty')[index].value || 0;
-        const price = document.querySelectorAll('.price')[index].value || 0;
-        doc.text(`${item}: Cantidad: ${qty}, Precio: ${price}`, 10, y);
-        y += 10;
+    doc.autoTable({
+        head: [['Concepto', 'Cantidad', 'Precio']],
+        body: items.map((item, index) => {
+            const qty = document.querySelectorAll('.qty')[index].value || 0;
+            const price = document.querySelectorAll('.price')[index].value || 0;
+            return [item, qty, price];
+        }),
+        startY: y
     });
 
+    y += items.length * 10 + 10;
     const taxRate = document.getElementById('tax').value || 0;
     const total = document.getElementById('total').innerText;
     doc.text(`Impuestos: ${taxRate}%`, 10, y);
@@ -64,6 +67,11 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/service-worker.js')
         .then(registration => {
             console.log('Service Worker registrado con éxito:', registration);
+        })
+        .catch(error => {
+            console.log('Error al registrar el Service Worker:', error);
+        });
+}
         })
         .catch(error => {
             console.log('Error al registrar el Service Worker:', error);
