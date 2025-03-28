@@ -22,8 +22,10 @@ function addItem() {
     if (selectedItem) {
         const row = document.createElement('tr');
         row.innerHTML = `
+            <td><input type="text" placeholder="Unidad" class="unit"></td>
             <td>${selectedItem}</td>
-            <td><input type="number" placeholder="Cantidad" class="qty"></td>
+            <td><input type="text" placeholder="Vehículo" class="vehicle"></td>
+            <td><input type="number" placeholder="P.U." class="unit-price"></td>
             <td><input type="number" placeholder="Precio" class="price"></td>
         `;
         itemsContainer.appendChild(row);
@@ -33,7 +35,7 @@ function addItem() {
 
 function calculateTotal() {
     let total = 0;
-    const qtyInputs = document.querySelectorAll('.qty');
+    const qtyInputs = document.querySelectorAll('.unit-price');
     const priceInputs = document.querySelectorAll('.price');
 
     qtyInputs.forEach((qtyInput, index) => {
@@ -70,14 +72,18 @@ function downloadPDF() {
     const rows = document.querySelectorAll('#items tbody tr');
     rows.forEach(row => {
         const cells = row.querySelectorAll('td');
-        const concept = cells[0].textContent;
-        const qty = cells[1].querySelector('input').value || 0;
-        const price = cells[2].querySelector('input').value || 0;
-        tableData.push([concept, qty, price]);
+        const unit = cells[0].querySelector('input').value || '';
+        const concept = cells[1].textContent;
+        const vehicle = cells[2].querySelector('input').value || '';
+        const unitPrice = cells[3].querySelector('input').value || 0;
+        const price = cells[4].querySelector('input').value || 0;
+        if (unitPrice && price) {
+            tableData.push([unit, concept, vehicle, unitPrice, price]);
+        }
     });
 
     doc.autoTable({
-        head: [['Concepto', 'Cantidad', 'Precio']],
+        head: [['Unidad', 'Concepto', 'Vehículo', 'P.U.', 'Precio']],
         body: tableData,
         startY: y
     });
