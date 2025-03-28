@@ -42,13 +42,18 @@
         <tbody>
             <!-- Filas de productos se agregarán aquí -->
         </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="4" style="text-align: right;">Impuestos (%)</td>
+                <td><input type="number" id="tax" placeholder="Porcentaje de Impuestos"></td>
+            </tr>
+            <tr>
+                <td colspan="4" style="text-align: right;">Total</td>
+                <td id="total">$0.00</td>
+            </tr>
+        </tfoot>
     </table>
-    <div class="item">
-        <label for="tax">Impuestos (%)</label>
-        <input type="number" id="tax" placeholder="Porcentaje de Impuestos">
-    </div>
     <button onclick="calculateTotal()">Calcular Total</button>
-    <div class="total" id="total">Total: $0.00</div>
     <button onclick="downloadPDF()">Descargar PDF</button>
 </body>
 </html>
