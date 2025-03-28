@@ -12,15 +12,22 @@
 </head>
 <body>
     <h1>Presupuesto</h1>
+    <div id="client-info">
+        <label for="client-name">Nombre del Cliente:</label>
+        <input type="text" id="client-name" placeholder="Nombre del Cliente">
+        <label for="client-city">Ciudad:</label>
+        <input type="text" id="client-city" placeholder="Ciudad">
+        <label for="client-phone">Teléfono:</label>
+        <input type="text" id="client-phone" placeholder="Teléfono">
+        <label for="client-email">Email:</label>
+        <input type="email" id="client-email" placeholder="Email">
+    </div>
     <table id="items">
         <thead>
             <tr>
                 <th>Concepto</th>
                 <th>Cantidad</th>
-                <th>Precio</th>
-            </tr>
-        </thead>
-        <tbody>
+                       <tbody>
             <!-- Filas de productos se agregarán aquí -->
         </tbody>
     </table>
