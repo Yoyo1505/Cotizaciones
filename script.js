@@ -49,14 +49,15 @@ function calculateTotal() {
     const taxRate = parseFloat(document.getElementById('tax').value) || 0;
     total += total * (taxRate / 100);
 
-    document.getElementById('total').innerText = `Total: $${total.toFixed(2)}`;
+    document.getElementById('total').innerText = `$${total.toFixed(2)}`;
 }
 
 function downloadPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    // Información del cliente
+    // Información del cliente con tamaño de fuente ajustado
+    doc.setFontSize(12);
     const clientName = document.getElementById('client-name').value || 'Nombre del Cliente';
     const clientCity = document.getElementById('client-city').value || 'Ciudad';
     const clientPhone = document.getElementById('client-phone').value || 'Teléfono';
@@ -94,7 +95,7 @@ function downloadPDF() {
     const total = document.getElementById('total').innerText;
     doc.text(`Impuestos: ${taxRate}%`, 10, y);
     y += 10;
-    doc.text(total, 10, y);
+    doc.text(`Total: ${total}`, 10, y);
 
     doc.save("presupuesto.pdf");
 }
