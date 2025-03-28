@@ -39,8 +39,19 @@ function downloadPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    doc.text("Presupuesto", 10, 10);
-    let y = 20;
+    // Información del cliente
+    const clientName = document.getElementById('client-name').value || 'Nombre del Cliente';
+    const clientCity = document.getElementById('client-city').value || 'Ciudad';
+    const clientPhone = document.getElementById('client-phone').value || 'Teléfono';
+    const clientEmail = document.getElementById('client-email').value || 'Email';
+
+    doc.text("COTIZACIÓN", 10, 10);
+    doc.text(`Nombre del Cliente: ${clientName}`, 10, 20);
+    doc.text(`Ciudad: ${clientCity}`, 10, 30);
+    doc.text(`Teléfono: ${clientPhone}`, 10, 40);
+    doc.text(`Email: ${clientEmail}`, 10, 50);
+
+    let y = 60;
 
     doc.autoTable({
         head: [['Concepto', 'Cantidad', 'Precio']],
