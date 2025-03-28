@@ -22,11 +22,11 @@ function addItem() {
     if (selectedItem) {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td><input type="text" placeholder="Unidad" class="unit"></td>
+            <td><input type="number" placeholder="Cantidad" class="unit"></td>
+            <td>Servicio de Transportación Ejecutiva</td>
             <td>${selectedItem}</td>
-            <td><input type="text" placeholder="Vehículo" class="vehicle"></td>
             <td><input type="number" placeholder="P.U." class="unit-price"></td>
-            <td><input type="number" placeholder="Precio" class="price"></td>
+            <td class="price">$0.00</td>
         `;
         itemsContainer.appendChild(row);
         itemSelect.value = ''; // Resetear el menú desplegable
@@ -35,13 +35,15 @@ function addItem() {
 
 function calculateTotal() {
     let total = 0;
-    const qtyInputs = document.querySelectorAll('.unit-price');
-    const priceInputs = document.querySelectorAll('.price');
+    const rows = document.querySelectorAll('#items tbody tr');
 
-    qtyInputs.forEach((qtyInput, index) => {
-        const qty = parseFloat(qtyInput.value) || 0;
-        const price = parseFloat(priceInputs[index].value) || 0;
-        total += qty * price;
+    rows.forEach(row => {
+        const unitInput = row.querySelector('.unit').value || 0;
+        const unitPriceInput = row.querySelector('.unit-price').value || 0;
+        const priceCell = row.querySelector('.price');
+        const price = unitInput * unitPriceInput;
+        priceCell.textContent = `$${price.toFixed(2)}`;
+        total += price;
     });
 
     const taxRate = parseFloat(document.getElementById('tax').value) || 0;
@@ -71,13 +73,12 @@ function downloadPDF() {
     const tableData = [];
     const rows = document.querySelectorAll('#items tbody tr');
     rows.forEach(row => {
-        const cells = row.querySelectorAll('td');
-        const unit = cells[0].querySelector('input').value || '';
-        const concept = cells[1].textContent;
-        const vehicle = cells[2].querySelector('input').value || '';
-        const unitPrice = cells[3].querySelector('input').value || 0;
-        const price = cells[4].querySelector('input').value || 0;
-        if (unitPrice && price) {
+        const unit = row.querySelector('.unit').value || '';
+        const concept = 'Servicio de Transportación Ejecutiva';
+        const vehicle = row.cells[2].textContent;
+        const unitPrice = row.querySelector('.unit-price').value || 0;
+        const price = row.querySelector('.price').textContent || 0;
+        if (unit && unitPrice && price) {
             tableData.push([unit, concept, vehicle, unitPrice, price]);
         }
     });
