@@ -69,8 +69,7 @@ function downloadPDF() {
     doc.text(`Teléfono: ${clientPhone}`, 10, 30);
     doc.text(`Email: ${clientEmail}`, 10, 35);
 
-    // Información del vendedor
-    doc.setFontSize(12);
+    // Información del vendedor con el mismo tamaño de fuente
     doc.text("RICHY ENTERTAINMENT S.A.S. DE C.V.", 150, 10);
     doc.text("CDMX", 150, 15);
     doc.text("52 55 7341 3969", 150, 20);
