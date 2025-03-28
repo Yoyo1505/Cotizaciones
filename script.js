@@ -72,6 +72,9 @@ if ('serviceWorker' in navigator) {
             console.log('Error al registrar el Service Worker:', error);
         });
 }
+            console.log('Error al registrar el Service Worker:', error);
+        });
+}
         })
         .catch(error => {
             console.log('Error al registrar el Service Worker:', error);
