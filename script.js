@@ -56,23 +56,19 @@ function downloadPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    // Agregar el logo
-    const logo = 'data:application/pdf;base64,' + btoa('RICHY ENTERTAINMENT\nTRANSPORTE EJECUTIVO\n');
-    doc.addImage(logo, 'PDF', 10, 10, 50, 20);
-
-    // Información del cliente con fuente más pequeña
-    doc.setFontSize(10);
+    // Información del cliente
     const clientName = document.getElementById('client-name').value || 'Nombre del Cliente';
     const clientCity = document.getElementById('client-city').value || 'Ciudad';
     const clientPhone = document.getElementById('client-phone').value || 'Teléfono';
     const clientEmail = document.getElementById('client-email').value || 'Email';
 
-    doc.text(`Nombre del Cliente: ${clientName}`, 10, 40);
-    doc.text(`Ciudad: ${clientCity}`, 10, 50);
-    doc.text(`Teléfono: ${clientPhone}`, 10, 60);
-    doc.text(`Email: ${clientEmail}`, 10, 70);
+    doc.text("COTIZACIÓN", 10, 10);
+    doc.text(`Nombre del Cliente: ${clientName}`, 10, 20);
+    doc.text(`Ciudad: ${clientCity}`, 10, 30);
+    doc.text(`Teléfono: ${clientPhone}`, 10, 40);
+    doc.text(`Email: ${clientEmail}`, 10, 50);
 
-    let y = 80;
+    let y = 60;
 
     const tableData = [];
     const rows = document.querySelectorAll('#items tbody tr');
