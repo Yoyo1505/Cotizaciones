@@ -57,7 +57,7 @@ function downloadPDF() {
     const doc = new jsPDF();
 
     // Información del cliente con tamaño de fuente ajustado
-    doc.setFontSize(12);
+    doc.setFontSize(10);
     const clientName = document.getElementById('client-name').value || 'Nombre del Cliente';
     const clientCity = document.getElementById('client-city').value || 'Ciudad';
     const clientPhone = document.getElementById('client-phone').value || 'Teléfono';
@@ -65,11 +65,18 @@ function downloadPDF() {
 
     doc.text("COTIZACIÓN", 10, 10);
     doc.text(`Nombre del Cliente: ${clientName}`, 10, 20);
-    doc.text(`Ciudad: ${clientCity}`, 10, 30);
-    doc.text(`Teléfono: ${clientPhone}`, 10, 40);
-    doc.text(`Email: ${clientEmail}`, 10, 50);
+    doc.text(`Ciudad: ${clientCity}`, 10, 25);
+    doc.text(`Teléfono: ${clientPhone}`, 10, 30);
+    doc.text(`Email: ${clientEmail}`, 10, 35);
 
-    let y = 60;
+    // Información del vendedor
+    doc.setFontSize(12);
+    doc.text("RICHY ENTERTAINMENT S.A.S. DE C.V.", 150, 10);
+    doc.text("CDMX", 150, 15);
+    doc.text("52 55 7341 3969", 150, 20);
+    doc.text("transpo_rick@hotmail.com", 150, 25);
+
+    let y = 45;
 
     const tableData = [];
     const rows = document.querySelectorAll('#items tbody tr');
@@ -93,9 +100,9 @@ function downloadPDF() {
     y += tableData.length * 10 + 10;
     const taxRate = document.getElementById('tax').value || 0;
     const total = document.getElementById('total').innerText;
-    doc.text(`Impuestos: ${taxRate}%`, 10, y);
+    doc.text(`Impuestos: ${taxRate}%`, 150, y);
     y += 10;
-    doc.text(`Total: ${total}`, 10, y);
+    doc.text(`Total: ${total}`, 150, y);
 
     doc.save("presupuesto.pdf");
 }
