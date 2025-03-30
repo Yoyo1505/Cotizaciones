@@ -147,13 +147,13 @@
 
             // Cargar el logo
             const logo = new Image();
-            logo.src = 'Logo.jpg';
+            logo.src = 'logo.png';
             logo.onload = function() {
                 const pageWidth = doc.internal.pageSize.getWidth();
                 const logoWidth = 125; // Logo de 145x90
                 const logoHeight = 60; // Proporción ajustada
                 const x = (pageWidth - logoWidth) / 2; // Centrado horizontalmente
-                doc.addImage(logo, 'JPEG', x, 5, logoWidth, logoHeight);
+                doc.addImage(logo, 'PNG', x, 5, logoWidth, logoHeight);
                 generatePDFContent(doc);
                 doc.save("cotizacion_richy_entertainment.pdf");
             };
@@ -167,7 +167,7 @@
         function generatePDFContent(doc) {
             // Configuración general de fuentes y colores
             doc.setFont("Helvetica", "normal");
-            doc.setTextColor(33, 33, 33); // Color gris oscuro para el texto
+            doc.setTextColor(33, 62, 99); // Color gris oscuro para el texto
 
             // Fondo de encabezado (rectángulo azul oscuro)
             doc.setFillColor(33, 62, 99); // Azul oscuro elegante
@@ -205,7 +205,7 @@
             doc.setTextColor(33, 62, 99); // Restaurar color
 
             // Línea decorativa debajo del título
-            doc.setDrawColor(33, 150, 243); // Línea azul
+            doc.setDrawColor(33, 62, 99); // Línea azul
             doc.setLineWidth(0.3);
             doc.line(10, 50, 200, 50);
 
@@ -235,11 +235,11 @@
                     font: "Helvetica", 
                     textColor: [33, 33, 33], 
                     lineWidth: 0.3, 
-                    lineColor: [33, 150, 243], // Bordes azules
+                    lineColor: [33, 62, 99], // Bordes azules
                     cellPadding: 3
                 },
                 headStyles: { 
-                    fillColor: [33, 150, 243], // Fondo azul para el encabezado
+                    fillColor: [33, 62, 99], // Fondo azul para el encabezado
                     textColor: [255, 255, 255], // Texto blanco
                     fontSize: 9,
                     fontStyle: "bold",
