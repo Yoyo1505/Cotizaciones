@@ -371,36 +371,47 @@
             const pageWidth = doc.internal.pageSize.getWidth() - marginLeft - marginRight;
             const pageHeight = doc.internal.pageSize.getHeight();
 
+            // Encabezado mejorado
             function addHeader() {
                 if (logoData) {
-                    const logoWidth = 60;
+                    const logoWidth = 50;
                     const logoHeight = (document.getElementById('logo').naturalHeight / document.getElementById('logo').naturalWidth) * logoWidth;
-                    const logoX = (doc.internal.pageSize.getWidth() - logoWidth) / 2;
+                    const logoX = marginLeft;
                     doc.addImage(logoData, 'PNG', logoX, 10, logoWidth, logoHeight);
+                    
+                    doc.setFontSize(20);
+                    doc.setFont("helvetica", "bold");
+                    doc.setTextColor(0, 35, 102);
+                    doc.text("Richy Entertainment", marginLeft + logoWidth + 10, 20);
+                    
+                    doc.setFontSize(10);
+                    doc.setTextColor(100, 100, 100);
+                    doc.text("Transportación Ejecutiva de Excelencia", marginLeft + logoWidth + 10, 27);
                     return logoHeight + 15;
                 } else {
                     doc.setFillColor(0, 35, 102);
-                    doc.rect(0, 0, doc.internal.pageSize.getWidth(), 40, 'F');
+                    doc.rect(0, 0, doc.internal.pageSize.getWidth(), 35, 'F');
                     
                     doc.setFontSize(24);
                     doc.setFont("helvetica", "bold");
                     doc.setTextColor(255, 255, 255);
-                    doc.text("Richy Entertainment", doc.internal.pageSize.getWidth() / 2, 25, { align: 'center' });
+                    doc.text("Richy Entertainment", doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
                     
                     doc.setFontSize(10);
-                    doc.setFont("helvetica", "normal");
+                    doc.setFont("helvetica", "italic");
                     doc.setTextColor(200, 200, 200);
-                    doc.text("Transportación Ejecutiva de Excelencia", doc.internal.pageSize.getWidth() / 2, 32, { align: 'center' });
+                    doc.text("Transportación Ejecutiva de Excelencia", doc.internal.pageSize.getWidth() / 2, 27, { align: 'center' });
                     
                     doc.setDrawColor(209, 0, 0);
-                    doc.setLineWidth(0.8);
-                    doc.line(marginLeft, 45, doc.internal.pageSize.getWidth() - marginRight, 45);
-                    return 50;
+                    doc.setLineWidth(1);
+                    doc.line(marginLeft, 40, doc.internal.pageSize.getWidth() - marginRight, 40);
+                    return 45;
                 }
             }
 
             const headerHeight = addHeader();
 
+            // Datos de folio y fecha
             const folio = document.getElementById('folio-number').value || 'Sin folio';
             const date = new Date().toLocaleDateString('es-MX', {
                 year: 'numeric',
@@ -408,39 +419,41 @@
                 day: 'numeric'
             });
 
-            doc.setFontSize(10);
-            doc.setTextColor(100, 100, 100);
+            doc.setFontSize(9);
+            doc.setTextColor(80, 80, 80);
             doc.setFont("helvetica", "normal");
-            doc.text(`Fecha: ${date}`, marginLeft, headerHeight + 5);
-            doc.text(`Folio: ${folio}`, doc.internal.pageSize.getWidth() - marginRight, headerHeight + 5, { align: 'right' });
+            doc.text(`Folio: ${folio}`, marginLeft, headerHeight + 5);
+            doc.text(`Fecha: ${date}`, doc.internal.pageSize.getWidth() - marginRight, headerHeight + 5, { align: 'right' });
 
-            doc.setFontSize(18);
+            // Título de la cotización
+            doc.setFontSize(16);
             doc.setTextColor(0, 35, 102);
             doc.setFont("helvetica", "bold");
             doc.text("COTIZACIÓN", doc.internal.pageSize.getWidth() / 2, headerHeight + 20, { align: 'center' });
 
+            // Datos del cliente
             doc.setFontSize(12);
             doc.setTextColor(0, 35, 102);
             doc.setFont("helvetica", "bold");
-            doc.text("DATOS DEL CLIENTE", marginLeft, headerHeight + 35);
+            doc.text("Datos del Cliente", marginLeft, headerHeight + 35);
 
             const clientName = document.getElementById('client-name').value || 'No especificado';
             const clientCity = document.getElementById('client-city').value || 'No especificado';
             const clientPhone = document.getElementById('client-phone').value || 'No especificado';
             const clientEmail = document.getElementById('client-email').value || 'No especificado';
 
+            doc.setFillColor(245, 245, 245);
+            doc.roundedRect(marginLeft, headerHeight + 40, pageWidth, 35, 3, 3, 'F');
+            
             doc.setFontSize(10);
             doc.setTextColor(50, 50, 50);
             doc.setFont("helvetica", "normal");
-            doc.text(`Nombre: ${clientName}`, marginLeft + 5, headerHeight + 45);
-            doc.text(`Ciudad: ${clientCity}`, marginLeft + 5, headerHeight + 52);
-            doc.text(`Teléfono: ${clientPhone}`, marginLeft + 5, headerHeight + 59);
-            doc.text(`Email: ${clientEmail}`, marginLeft + 5, headerHeight + 66);
+            doc.text(`Nombre: ${clientName}`, marginLeft + 5, headerHeight + 48);
+            doc.text(`Ciudad: ${clientCity}`, marginLeft + 5, headerHeight + 55);
+            doc.text(`Teléfono: ${clientPhone}`, marginLeft + 5, headerHeight + 62);
+            doc.text(`Email: ${clientEmail}`, marginLeft + 5, headerHeight + 69);
 
-            doc.setDrawColor(209, 0, 0);
-            doc.setLineWidth(0.3);
-            doc.line(marginLeft, headerHeight + 70, doc.internal.pageSize.getWidth() - marginRight, headerHeight + 70);
-
+            // Tabla de ítems
             const tableData = [];
             const rows = document.querySelectorAll('#items tbody tr');
 
@@ -463,7 +476,7 @@
             doc.autoTable({
                 head: [['Cant.', 'Concepto', 'Descripción', 'P. Unitario', 'Total']],
                 body: tableData,
-                startY: headerHeight + 75,
+                startY: headerHeight + 80,
                 headStyles: {
                     fillColor: [0, 35, 102],
                     textColor: [255, 255, 255],
@@ -500,7 +513,8 @@
                 }
             });
 
-            const finalY = doc.lastAutoTable.finalY + 10;
+            // Totales
+            const finalY = doc.lastAutoTable.finalY + 15;
             const taxRate = parseFloat(document.getElementById('tax').value) || 0;
             const totalText = document.getElementById('total').textContent;
             const total = parseFloat(totalText.replace('$', '')) || 0;
@@ -508,52 +522,41 @@
             const taxAmount = total - subtotal;
 
             doc.setFillColor(0, 35, 102);
-            doc.roundedRect(marginLeft, finalY, pageWidth, 35, 3, 3, 'F');
+            doc.roundedRect(marginLeft, finalY, pageWidth, 40, 5, 5, 'F');
 
             doc.setFontSize(14);
             doc.setTextColor(255, 255, 255);
             doc.setFont("helvetica", "bold");
-            doc.text("RESUMEN DE PAGO", marginLeft + 5, finalY + 10);
+            doc.text("Resumen de Pago", marginLeft + 5, finalY + 10);
 
-            doc.setFontSize(10);
+            doc.setFontSize(11);
             doc.setFont("helvetica", "normal");
-            doc.text(`Subtotal: $${subtotal.toFixed(2)}`, marginLeft + pageWidth - 60, finalY + 20);
-            doc.text(`Impuestos (${taxRate}%): $${taxAmount.toFixed(2)}`, marginLeft + pageWidth - 60, finalY + 27);
+            doc.text(`Subtotal:`, marginLeft + pageWidth - 70, finalY + 20);
+            doc.text(`$${subtotal.toFixed(2)}`, marginLeft + pageWidth - 10, finalY + 20, { align: 'right' });
             
-            doc.setFontSize(12);
+            doc.text(`Impuestos (${taxRate}%):`, marginLeft + pageWidth - 70, finalY + 28);
+            doc.text(`$${taxAmount.toFixed(2)}`, marginLeft + pageWidth - 10, finalY + 28, { align: 'right' });
+            
+            doc.setFontSize(13);
             doc.setFont("helvetica", "bold");
-            doc.text(`Total: ${totalText}`, marginLeft + pageWidth - 60, finalY + 34);
+            doc.text(`Total:`, marginLeft + pageWidth - 70, finalY + 36);
+            doc.text(`${totalText}`, marginLeft + pageWidth - 10, finalY + 36, { align: 'right' });
 
-            const sellerY = finalY + 45;
+            // Pie de página con datos del vendedor
+            const footerY = pageHeight - 30;
             doc.setFillColor(245, 245, 245);
-            doc.roundedRect(marginLeft, sellerY, pageWidth, 45, 3, 3, 'F');
-            doc.setDrawColor(200, 200, 200);
-            doc.setLineWidth(0.2);
-            doc.roundedRect(marginLeft, sellerY, pageWidth, 45, 3, 3);
-
-            doc.setFontSize(12);
-            doc.setTextColor(0, 35, 102);
-            doc.setFont("helvetica", "bold");
-            doc.text("DATOS DEL VENDEDOR", marginLeft + 5, sellerY + 10);
-
-            doc.setFontSize(9);
-            doc.setTextColor(50, 50, 50);
-            doc.setFont("helvetica", "normal");
-            doc.text("Richy Entertainment S.A.S. de C.V.", marginLeft + 5, sellerY + 20);
-            doc.text("Teléfono: 52 55 7341 3969", marginLeft + 5, sellerY + 27);
-            doc.text("Email: transpo_rick@hotmail.com", marginLeft + 5, sellerY + 34);
-
-            doc.text("Banco: Santander", marginLeft + pageWidth/2, sellerY + 20);
-            doc.text("Cuenta: 65-51041870-7", marginLeft + pageWidth/2, sellerY + 27);
-            doc.text("CL guessing: 014180655104187070", marginLeft + pageWidth/2, sellerY + 34);
+            doc.rect(0, footerY, doc.internal.pageSize.getWidth(), 30, 'F');
 
             doc.setDrawColor(209, 0, 0);
             doc.setLineWidth(0.5);
-            doc.line(marginLeft, pageHeight - 15, doc.internal.pageSize.getWidth() - marginRight, pageHeight - 15);
+            doc.line(marginLeft, footerY, doc.internal.pageSize.getWidth() - marginRight, footerY);
 
-            doc.setFontSize(8);
-            doc.setTextColor(100, 100, 100);
-            doc.text("© 2025 Richy Entertainment - Todos los derechos reservados", doc.internal.pageSize.getWidth() / 2, pageHeight - 5, { align: 'center' });
+            doc.setFontSize(7);
+            doc.setTextColor(80, 80, 80);
+            doc.setFont("helvetica", "normal");
+            doc.text("Richy Entertainment S.A.S. de C.V. | Teléfono: 52 55 7341 3969 | Email: transpo_rick@hotmail.com", marginLeft, footerY + 8);
+            doc.text("Banco: Santander | Cuenta: 65-51041870-7 | CLABE: 014180655104187070", marginLeft, footerY + 14);
+            doc.text("© 2025 Richy Entertainment - Todos los derechos reservados", doc.internal.pageSize.getWidth() / 2, footerY + 22, { align: 'center' });
 
             createPrintPreview(doc);
             const fileName = `Cotización_${folio}_${clientName.replace(/[^a-z0-9]/gi, '_')}.pdf`;
