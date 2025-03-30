@@ -32,12 +32,19 @@
         button {
             margin: 10px 0;
             padding: 10px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0b7dda;
         }
     </style>
 </head>
 <body>
     <h1>Generador de Cotización</h1>
-    <img id="logo" src="logo.png" alt="Logotipo" style="width:150px;height:auto;" onerror="this.src='https://via.placeholder.com/150x90?text=Logo+No+Disponible';">
+    <img id="logo" src="logo.png" alt="Logotipo" style="width:150px;height:auto;">
 
     <!-- Datos del cliente con folio -->
     <div>
@@ -67,6 +74,7 @@
                 <th>Vehículo</th>
                 <th>P.U.</th>
                 <th>Precio</th>
+                <th>Acción</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -74,7 +82,7 @@
 
     <!-- Impuestos y total -->
     <div>
-        <label>Impuestos (%): <input type="number" id="tax" value="0" onchange="calculateTotal()"></label><br>
+        <label>Impuestos (%): <input type="number" id="tax" value="0" min="0" onchange="calculateTotal()"></label><br>
         <strong>Total: <span id="total">$0.00</span></strong>
     </div>
 
@@ -114,21 +122,29 @@
             if (selectedItem) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td><input type="number" placeholder="Cantidad" class="unit" onchange="calculateTotal()"></td>
+                    <td><input type="number" placeholder="Cantidad" class="unit" min="1" value="1" onchange="calculateTotal()"></td>
                     <td>Servicio de Transportación Ejecutiva</td>
                     <td>${selectedItem}</td>
-                    <td><input type="number" placeholder="P.U." class="unit-price" onchange="calculateTotal()"></td>
+                    <td><input type="number" placeholder="P.U." class="unit-price" min="0" step="0.01" onchange="calculateTotal()"></td>
                     <td class="price">$0.00</td>
+                    <td><button class="remove-btn" onclick="removeItem(this)">Eliminar</button></td>
                 `;
                 itemsContainer.appendChild(row);
                 itemSelect.value = '';
+                calculateTotal();
             } else {
                 alert('Por favor, selecciona un ítem antes de agregar.');
             }
         }
 
+        function removeItem(button) {
+            const row = button.closest('tr');
+            row.remove();
+            calculateTotal();
+        }
+
         function calculateTotal() {
-            let total = 0;
+            let subtotal = 0;
             const rows = document.querySelectorAll('#items tbody tr');
             rows.forEach(row => {
                 const unitInput = parseFloat(row.querySelector('.unit').value) || 0;
@@ -136,228 +152,149 @@
                 const priceCell = row.querySelector('.price');
                 const price = unitInput * unitPriceInput;
                 priceCell.textContent = `$${price.toFixed(2)}`;
-                total += price;
+                subtotal += price;
             });
+            
             const taxRate = parseFloat(document.getElementById('tax').value) || 0;
-            total += total * (taxRate / 100);
+            const taxAmount = subtotal * (taxRate / 100);
+            const total = subtotal + taxAmount;
+            
             document.getElementById('total').innerText = `$${total.toFixed(2)}`;
         }
 
-        function downloadPDF() {
+        async function downloadPDF() {
             const doc = new jsPDF();
-            const logo = document.getElementById('logo');
-
-            // Función para agregar el logo al PDF
-            function addLogoToPDF() {
-                return new Promise((resolve) => {
-                    const imgData = getImageData(logo);
-                    const pageWidth = doc.internal.pageSize.getWidth();
-                    const logoWidth = 125;
-                    const logoHeight = 60;
-                    const x = (pageWidth - logoWidth) / 2;
-                    doc.addImage(imgData, 'PNG', x, 5, logoWidth, logoHeight);
-                    resolve();
-                });
+            
+            // Agregar logo al PDF
+            try {
+                const logo = document.getElementById('logo');
+                const logoData = await getImageData(logo);
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const logoWidth = 40;
+                const logoHeight = (logo.naturalHeight / logo.naturalWidth) * logoWidth;
+                doc.addImage(logoData, 'PNG', (pageWidth - logoWidth) / 2, 10, logoWidth, logoHeight);
+            } catch (error) {
+                console.error("Error al cargar el logo:", error);
             }
 
-            // Función para obtener los datos de la imagen
-            function getImageData(imgElement) {
-                const canvas = document.createElement('canvas');
-                canvas.width = imgElement.width;
-                canvas.height = imgElement.height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(imgElement, 0, 0, imgElement.width, imgElement.height);
-                return canvas.toDataURL('image/png');
-            }
-
-            // Generar el contenido del PDF después de cargar el logo
-            addLogoToPDF().then(() => {
-                generatePDFContent(doc);
-                doc.save("cotizacion_richy_entertainment.pdf");
-            }).catch(error => {
-                console.error("Error al agregar el logo:", error);
-                generatePDFContent(doc); // Generar PDF sin logo si falla
-                doc.save("cotizacion_richy_entertainment.pdf");
-            });
-        }
-
-        function generatePDFContent(doc) {
-            doc.setFont("Helvetica", "normal");
-            doc.setTextColor(33, 62, 99);
-            doc.setFillColor(33, 62, 99);
-            doc.rect(0, 0, 210, 30, 'F');
-            doc.setDrawColor(255, 215, 0);
-            doc.setLineWidth(0.5);
-            doc.line(10, 30, 200, 30);
-
-            doc.setFontSize(8);
-            doc.setTextColor(255, 255, 255);
-            doc.text(`Fecha: ${new Date().toLocaleDateString('es-MX')}`, 10, 20);
+            // Datos del cliente
             const folio = document.getElementById('folio-number').value || 'Sin Folio';
-            doc.setFontSize(10);
-            doc.setTextColor(255, 215, 0);
-            doc.text(`Folio: ${folio}`, 170, 20);
-            doc.setTextColor(33, 33, 33);
-
-            doc.setFontSize(18);
-            doc.setFont("Helvetica", "bold");
-            const title = "RICHY ENTERTAINMENT";
-            const titleWidth = doc.getTextWidth(title);
-            const pageWidth = doc.internal.pageSize.getWidth();
-            doc.setTextColor(200, 200, 200);
-            doc.text(title, (pageWidth - titleWidth) / 2, 45);
-            doc.setTextColor(33, 62, 99);
-            doc.text(title, (pageWidth - titleWidth) / 2 + 0.5, 45 + 0.5);
-            doc.setTextColor(33, 62, 99);
-            doc.setDrawColor(33, 62, 99);
-            doc.setLineWidth(0.3);
-            doc.line(10, 50, 200, 50);
-
-            let y = 60;
-            const tableData = [];
-            const rows = document.querySelectorAll('#items tbody tr');
-            rows.forEach(row => {
-                const unit = row.querySelector('.unit').value || '';
-                const concept = 'Servicio de Transportación Ejecutiva';
-                const vehicle = row.cells[2].textContent;
-                const unitPrice = row.querySelector('.unit-price').value || '';
-                const price = row.querySelector('.price').textContent || '$0.00';
-                if (unit && unitPrice && price !== '$0.00') {
-                    tableData.push([unit, concept, vehicle, unitPrice, price]);
-                }
-            });
-
-            doc.autoTable({
-                head: [['Unidad', 'Concepto', 'Vehículo', 'P.U.', 'Precio']],
-                body: tableData,
-                startY: y,
-                theme: 'grid',
-                styles: { 
-                    fontSize: 8, 
-                    font: "Helvetica", 
-                    textColor: [33, 33, 33], 
-                    lineWidth: 0.3, 
-                    lineColor: [33, 62, 99],
-                    cellPadding: 3
-                },
-                headStyles: { 
-                    fillColor: [33, 62, 99],
-                    textColor: [255, 255, 255],
-                    fontSize: 9,
-                    fontStyle: "bold",
-                    halign: 'center'
-                },
-                bodyStyles: {
-                    fillColor: [255, 255, 255],
-                    textColor: [33, 33, 33]
-                },
-                alternateRowStyles: { 
-                    fillColor: [240, 245, 255]
-                },
-                columnStyles: {
-                    0: { cellWidth: 20, halign: 'center' },
-                    1: { cellWidth: 50 },
-                    2: { cellWidth: 50 },
-                    3: { cellWidth: 30, halign: 'right' },
-                    4: { cellWidth: 30, halign: 'right' }
-                },
-                margin: { top: 60 }
-            });
-
-            y = doc.lastAutoTable.finalY + 10;
-            const taxRate = document.getElementById('tax').value || 0;
-            const total = document.getElementById('total').innerText;
-
-            doc.setFillColor(240, 245, 255);
-            doc.rect(130, y - 5, 70, 20, 'F');
-            doc.setDrawColor(33, 150, 243);
-            doc.setLineWidth(0.3);
-            doc.rect(130, y - 5, 70, 20);
-
-            doc.setFontSize(10);
-            doc.setFont("Helvetica", "bold");
-            doc.setTextColor(33, 62, 99);
-            doc.text(`Impuestos: ${taxRate}%`, 135, y);
-            y += 8;
-            doc.text(`Total: ${total}`, 135, y);
-            doc.setTextColor(33, 33, 33);
-
-            y += 10;
-            doc.setDrawColor(33, 150, 243);
-            doc.setLineWidth(0.5);
-            doc.line(10, y, 200, y);
-            y += 10;
-
             const clientName = document.getElementById('client-name').value || 'Nombre del Cliente';
             const clientCity = document.getElementById('client-city').value || 'Ciudad';
             const clientPhone = document.getElementById('client-phone').value || 'Teléfono';
             const clientEmail = document.getElementById('client-email').value || 'Email';
-
-            doc.setFillColor(245, 245, 245);
-            doc.rect(10, y - 5, 90, 35, 'F');
-            doc.setDrawColor(200, 200, 200);
-            doc.rect(10, y - 5, 90, 35);
-
-            doc.setFontSize(9);
-            doc.setFont("Helvetica", "bold");
+            const currentDate = new Date().toLocaleDateString('es-MX');
+            
+            // Encabezado
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`Fecha: ${currentDate}`, 14, 20);
+            doc.text(`Folio: ${folio}`, 160, 20);
+            
+            // Título
+            doc.setFontSize(16);
+            doc.setFont("helvetica", "bold");
             doc.setTextColor(33, 62, 99);
-            doc.text("Datos del Cliente", 15, y);
-            doc.setFont("Helvetica", "normal");
-            doc.setTextColor(33, 33, 33);
-            y += 5;
-            doc.text(`Nombre: ${clientName}`, 15, y);
-            y += 5;
-            doc.text(`Ciudad: ${clientCity}`, 15, y);
-            y += 5;
-            doc.text(`Teléfono: ${clientPhone}`, 15, y);
-            y += 5;
-            doc.text(`Email: ${clientEmail}`, 15, y);
-
-            y -= 20;
-            doc.setFillColor(245, 245, 245);
-            doc.rect(110, y - 5, 90, 55, 'F');
-            doc.setDrawColor(200, 200, 200);
-            doc.rect(110, y - 5, 90, 55);
-
-            doc.setFontSize(9);
-            doc.setFont("Helvetica", "bold");
-            doc.setTextColor(33, 62, 99);
-            doc.text("Datos del Vendedor", 115, y);
-            doc.setFont("Helvetica", "normal");
-            doc.setTextColor(33, 33, 33);
-            y += 5;
-            doc.text("RICHY ENTERTAINMENT S.A.S. DE C.V.", 115, y);
-            y += 5;
-            doc.text("CDMX", 115, y);
-            y += 5;
-            doc.text("52 55 7341 3969", 115, y);
-            y += 5;
-            doc.text("transpo_rick@hotmail.com", 115, y);
-
-            y += 5;
-            doc.setFont("Helvetica", "bold");
-            doc.setTextColor(33, 62, 99);
-            doc.text("Información Bancaria", 115, y);
-            doc.setFont("Helvetica", "normal");
-            doc.setTextColor(33, 33, 33);
-            y += 5;
-            doc.text("Banco: Santander", 115, y);
-            y += 5;
-            doc.text("Nombre: Richy Entertainment, SAS de CV", 115, y);
-            y += 5;
-            doc.text("Cuenta No.: 65-51041870-7", 115, y);
-            y += 5;
-            doc.text("Clabe Interbancaria: 014180655104187070", 115, y);
-
-            doc.setFillColor(33, 62, 99);
-            doc.rect(0, 270, 210, 30, 'F');
-            doc.setDrawColor(255, 215, 0);
+            doc.text("COTIZACIÓN", 105, 40, { align: 'center' });
+            
+            // Línea decorativa
+            doc.setDrawColor(33, 62, 99);
             doc.setLineWidth(0.5);
-            doc.line(10, 270, 200, 270);
+            doc.line(14, 45, 196, 45);
+            
+            // Datos del cliente
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "bold");
+            doc.text("Cliente:", 14, 60);
+            doc.setFont("helvetica", "normal");
+            doc.text(clientName, 30, 60);
+            doc.text(`Ciudad: ${clientCity}`, 14, 70);
+            doc.text(`Teléfono: ${clientPhone}`, 14, 80);
+            doc.text(`Email: ${clientEmail}`, 14, 90);
+            
+            // Tabla de items
+            const tableData = [];
+            const rows = document.querySelectorAll('#items tbody tr');
+            rows.forEach(row => {
+                const unit = row.querySelector('.unit').value || '1';
+                const concept = 'Servicio de Transportación Ejecutiva';
+                const vehicle = row.cells[2].textContent;
+                const unitPrice = row.querySelector('.unit-price').value || '0';
+                const price = row.querySelector('.price').textContent || '$0.00';
+                tableData.push([unit, concept, vehicle, `$${parseFloat(unitPrice).toFixed(2)}`, price]);
+            });
+            
+            doc.autoTable({
+                head: [['Cant.', 'Concepto', 'Vehículo', 'P.U.', 'Total']],
+                body: tableData,
+                startY: 100,
+                theme: 'grid',
+                headStyles: {
+                    fillColor: [33, 62, 99],
+                    textColor: [255, 255, 255],
+                    fontSize: 10,
+                    fontStyle: 'bold'
+                },
+                bodyStyles: {
+                    fontSize: 9
+                },
+                columnStyles: {
+                    0: { cellWidth: 15, halign: 'center' },
+                    1: { cellWidth: 60 },
+                    2: { cellWidth: 50 },
+                    3: { cellWidth: 25, halign: 'right' },
+                    4: { cellWidth: 25, halign: 'right' }
+                },
+                margin: { left: 14, right: 14 }
+            });
+            
+            // Totales
+            const yPosition = doc.lastAutoTable.finalY + 10;
+            const taxRate = document.getElementById('tax').value || 0;
+            const total = document.getElementById('total').textContent;
+            
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "bold");
+            doc.text(`Subtotal: $${(parseFloat(total.replace('$', '')) / (1 + parseFloat(taxRate)/100).toFixed(2)}`, 150, yPosition);
+            doc.text(`Impuestos (${taxRate}%): $${(parseFloat(total.replace('$', '')) - (parseFloat(total.replace('$', '')) / (1 + parseFloat(taxRate)/100)).toFixed(2)}`, 150, yPosition + 10);
+            doc.text(`Total: ${total}`, 150, yPosition + 20);
+            
+            // Pie de página
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            doc.text("Richy Entertainment S.A.S. de C.V.", 14, 280);
+            doc.text("Tel: 52 55 7341 3969 | Email: transpo_rick@hotmail.com", 14, 285);
+            doc.text("© 2025 Richy Entertainment. Todos los derechos reservados.", 105, 285, { align: 'center' });
+            
+            // Guardar PDF
+            doc.save(`Cotización_${folio}_${clientName.replace(/ /g, '_')}.pdf`);
+        }
 
-            doc.setFontSize(8);
-            doc.setTextColor(255, 255, 255);
-            doc.text("© 2025 Richy Entertainment. Todos los derechos reservados.", 10, 290);
+        function getImageData(imgElement) {
+            return new Promise((resolve, reject) => {
+                // Si la imagen ya está cargada
+                if (imgElement.complete && imgElement.naturalWidth !== 0) {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = imgElement.naturalWidth;
+                    canvas.height = imgElement.naturalHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(imgElement, 0, 0);
+                    resolve(canvas.toDataURL('image/png'));
+                } else {
+                    // Esperar a que la imagen se cargue
+                    imgElement.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = imgElement.naturalWidth;
+                        canvas.height = imgElement.naturalHeight;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(imgElement, 0, 0);
+                        resolve(canvas.toDataURL('image/png'));
+                    };
+                    imgElement.onerror = function() {
+                        reject(new Error("Error al cargar la imagen"));
+                    };
+                }
+            });
         }
     </script>
 </body>
