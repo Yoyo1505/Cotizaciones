@@ -15,12 +15,12 @@
             margin-top: 20px;
         }
         th, td {
-            border: 1px solid #2196F3; /* Borde azul */
+            border: 1px solid #2196F3;
             padding: 8px;
             text-align: left;
         }
         th {
-            background-color: #2196F3; /* Fondo azul */
+            background-color: #2196F3;
             color: white;
         }
         input[type="number"] {
@@ -37,7 +37,7 @@
 </head>
 <body>
     <h1>Generador de Cotización</h1>
-    <img src="logo.png" alt="Logotipo" style="width:150px;height:auto;"> <!-- Logotipo agregado aquí -->
+    <img id="logo" src="logo.png" alt="Logotipo" style="width:150px;height:auto;" onerror="this.src='https://via.placeholder.com/150x90?text=Logo+No+Disponible';">
 
     <!-- Datos del cliente con folio -->
     <div>
@@ -145,72 +145,74 @@
 
         function downloadPDF() {
             const doc = new jsPDF();
+            const logo = document.getElementById('logo');
 
-            // Cargar el logo
-            const logo = new Image();
-            logo.src = 'logo.png';
-            logo.onload = function() {
-                const pageWidth = doc.internal.pageSize.getWidth();
-                const logoWidth = 125; // Logo de 145x90
-                const logoHeight = 60; // Proporción ajustada
-                const x = (pageWidth - logoWidth) / 2; // Centrado horizontalmente
-                doc.addImage(logo, 'PNG', x, 5, logoWidth, logoHeight);
+            // Función para agregar el logo al PDF
+            function addLogoToPDF() {
+                return new Promise((resolve) => {
+                    const imgData = getImageData(logo);
+                    const pageWidth = doc.internal.pageSize.getWidth();
+                    const logoWidth = 125;
+                    const logoHeight = 60;
+                    const x = (pageWidth - logoWidth) / 2;
+                    doc.addImage(imgData, 'PNG', x, 5, logoWidth, logoHeight);
+                    resolve();
+                });
+            }
+
+            // Función para obtener los datos de la imagen
+            function getImageData(imgElement) {
+                const canvas = document.createElement('canvas');
+                canvas.width = imgElement.width;
+                canvas.height = imgElement.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(imgElement, 0, 0, imgElement.width, imgElement.height);
+                return canvas.toDataURL('image/png');
+            }
+
+            // Generar el contenido del PDF después de cargar el logo
+            addLogoToPDF().then(() => {
                 generatePDFContent(doc);
                 doc.save("cotizacion_richy_entertainment.pdf");
-            };
-            logo.onerror = function() {
-                console.error("Error al cargar el logo. Generando PDF sin logo.");
-                generatePDFContent(doc);
+            }).catch(error => {
+                console.error("Error al agregar el logo:", error);
+                generatePDFContent(doc); // Generar PDF sin logo si falla
                 doc.save("cotizacion_richy_entertainment.pdf");
-            };
+            });
         }
 
         function generatePDFContent(doc) {
-            // Configuración general de fuentes y colores
             doc.setFont("Helvetica", "normal");
-            doc.setTextColor(33, 62, 99); // Color gris oscuro para el texto
-
-            // Fondo de encabezado (rectángulo azul oscuro)
-            doc.setFillColor(33, 62, 99); // Azul oscuro elegante
-            doc.rect(0, 0, 210, 30, 'F'); // Rectángulo de fondo para el encabezado
-
-            // Línea decorativa en el encabezado
-            doc.setDrawColor(255, 215, 0); // Línea dorada
+            doc.setTextColor(33, 62, 99);
+            doc.setFillColor(33, 62, 99);
+            doc.rect(0, 0, 210, 30, 'F');
+            doc.setDrawColor(255, 215, 0);
             doc.setLineWidth(0.5);
             doc.line(10, 30, 200, 30);
 
-            // Fecha en el encabezado (izquierda)
             doc.setFontSize(8);
-            doc.setTextColor(255, 255, 255); // Texto blanco
+            doc.setTextColor(255, 255, 255);
             doc.text(`Fecha: ${new Date().toLocaleDateString('es-MX')}`, 10, 20);
-
-            // Folio en el encabezado (derecha)
             const folio = document.getElementById('folio-number').value || 'Sin Folio';
             doc.setFontSize(10);
-            doc.setTextColor(255, 215, 0); // Folio en dorado
+            doc.setTextColor(255, 215, 0);
             doc.text(`Folio: ${folio}`, 170, 20);
-            doc.setTextColor(33, 33, 33); // Restaurar color
+            doc.setTextColor(33, 33, 33);
 
-            // Título "COTIZACIÓN" centrado con sombra
             doc.setFontSize(18);
             doc.setFont("Helvetica", "bold");
             const title = "RICHY ENTERTAINMENT";
             const titleWidth = doc.getTextWidth(title);
             const pageWidth = doc.internal.pageSize.getWidth();
-            doc.setTextColor(200, 200, 200); // Azul oscuro para el título
+            doc.setTextColor(200, 200, 200);
             doc.text(title, (pageWidth - titleWidth) / 2, 45);
-
-            // Sombra para el título
-            doc.setTextColor(33, 62, 99); // Sombra gris clara
+            doc.setTextColor(33, 62, 99);
             doc.text(title, (pageWidth - titleWidth) / 2 + 0.5, 45 + 0.5);
-            doc.setTextColor(33, 62, 99); // Restaurar color
-
-            // Línea decorativa debajo del título
-            doc.setDrawColor(33, 62, 99); // Línea azul
+            doc.setTextColor(33, 62, 99);
+            doc.setDrawColor(33, 62, 99);
             doc.setLineWidth(0.3);
             doc.line(10, 50, 200, 50);
 
-            // Tabla de ítems
             let y = 60;
             const tableData = [];
             const rows = document.querySelectorAll('#items tbody tr');
@@ -225,7 +227,6 @@
                 }
             });
 
-            // Generar tabla con autoTable (estilo mejorado)
             doc.autoTable({
                 head: [['Unidad', 'Concepto', 'Vehículo', 'P.U.', 'Precio']],
                 body: tableData,
@@ -236,70 +237,63 @@
                     font: "Helvetica", 
                     textColor: [33, 33, 33], 
                     lineWidth: 0.3, 
-                    lineColor: [33, 62, 99], // Bordes azules
+                    lineColor: [33, 62, 99],
                     cellPadding: 3
                 },
                 headStyles: { 
-                    fillColor: [33, 62, 99], // Fondo azul para el encabezado
-                    textColor: [255, 255, 255], // Texto blanco
+                    fillColor: [33, 62, 99],
+                    textColor: [255, 255, 255],
                     fontSize: 9,
                     fontStyle: "bold",
                     halign: 'center'
                 },
                 bodyStyles: {
-                    fillColor: [255, 255, 255], // Fondo blanco para las filas
+                    fillColor: [255, 255, 255],
                     textColor: [33, 33, 33]
                 },
                 alternateRowStyles: { 
-                    fillColor: [240, 245, 255] // Fondo azul muy claro para filas alternas
+                    fillColor: [240, 245, 255]
                 },
                 columnStyles: {
-                    0: { cellWidth: 20, halign: 'center' }, // Unidad
-                    1: { cellWidth: 50 }, // Concepto
-                    2: { cellWidth: 50 }, // Vehículo
-                    3: { cellWidth: 30, halign: 'right' }, // P.U.
-                    4: { cellWidth: 30, halign: 'right' } // Precio
+                    0: { cellWidth: 20, halign: 'center' },
+                    1: { cellWidth: 50 },
+                    2: { cellWidth: 50 },
+                    3: { cellWidth: 30, halign: 'right' },
+                    4: { cellWidth: 30, halign: 'right' }
                 },
                 margin: { top: 60 }
             });
 
-            // Posición después de la tabla
             y = doc.lastAutoTable.finalY + 10;
-
-            // Impuestos y Total (en un cuadro destacado)
             const taxRate = document.getElementById('tax').value || 0;
             const total = document.getElementById('total').innerText;
 
-            // Cuadro de fondo para impuestos y total
-            doc.setFillColor(240, 245, 255); // Fondo azul claro
-            doc.rect(130, y - 5, 70, 20, 'F'); // Cuadro alrededor de impuestos y total
+            doc.setFillColor(240, 245, 255);
+            doc.rect(130, y - 5, 70, 20, 'F');
             doc.setDrawColor(33, 150, 243);
             doc.setLineWidth(0.3);
-            doc.rect(130, y - 5, 70, 20); // Borde del cuadro
+            doc.rect(130, y - 5, 70, 20);
 
             doc.setFontSize(10);
             doc.setFont("Helvetica", "bold");
-            doc.setTextColor(33, 62, 99); // Azul oscuro
+            doc.setTextColor(33, 62, 99);
             doc.text(`Impuestos: ${taxRate}%`, 135, y);
             y += 8;
             doc.text(`Total: ${total}`, 135, y);
-            doc.setTextColor(33, 33, 33); // Restaurar color
+            doc.setTextColor(33, 33, 33);
 
-            // Línea divisoria antes de los datos del cliente y vendedor
             y += 10;
-            doc.setDrawColor(33, 150, 243); // Línea azul
+            doc.setDrawColor(33, 150, 243);
             doc.setLineWidth(0.5);
             doc.line(10, y, 200, y);
             y += 10;
 
-            // Datos del cliente (izquierda) con fondo
             const clientName = document.getElementById('client-name').value || 'Nombre del Cliente';
             const clientCity = document.getElementById('client-city').value || 'Ciudad';
             const clientPhone = document.getElementById('client-phone').value || 'Teléfono';
             const clientEmail = document.getElementById('client-email').value || 'Email';
 
-            // Fondo para datos del cliente
-            doc.setFillColor(245, 245, 245); // Fondo gris claro
+            doc.setFillColor(245, 245, 245);
             doc.rect(10, y - 5, 90, 35, 'F');
             doc.setDrawColor(200, 200, 200);
             doc.rect(10, y - 5, 90, 35);
@@ -319,9 +313,8 @@
             y += 5;
             doc.text(`Email: ${clientEmail}`, 15, y);
 
-            // Datos del vendedor (derecha) con fondo
-            y -= 20; // Volver a la posición inicial para alinear con los datos del cliente
-            doc.setFillColor(245, 245, 245); // Fondo gris claro
+            y -= 20;
+            doc.setFillColor(245, 245, 245);
             doc.rect(110, y - 5, 90, 55, 'F');
             doc.setDrawColor(200, 200, 200);
             doc.rect(110, y - 5, 90, 55);
@@ -341,7 +334,6 @@
             y += 5;
             doc.text("transpo_rick@hotmail.com", 115, y);
 
-            // Información bancaria
             y += 5;
             doc.setFont("Helvetica", "bold");
             doc.setTextColor(33, 62, 99);
@@ -357,16 +349,16 @@
             y += 5;
             doc.text("Clabe Interbancaria: 014180655104187070", 115, y);
 
-            // Pie de página con fondo
-            doc.setFillColor(33, 62, 99); // Fondo azul oscuro
-            doc.rect(0, 270, 210, 30, 'F'); // Rectángulo de fondo para el pie de página
-
-            // Línea decorativa en el pie de página
-            doc.setDrawColor(255, 215, 0); // Línea dorada
+            doc.setFillColor(33, 62, 99);
+            doc.rect(0, 270, 210, 30, 'F');
+            doc.setDrawColor(255, 215, 0);
             doc.setLineWidth(0.5);
             doc.line(10, 270, 200, 270);
 
-            // Texto del pie de página
             doc.setFontSize(8);
-            doc.setTextColor(255, 255, 255); // Texto blanco
-            doc.text("©
+            doc.setTextColor(255, 255, 255);
+            doc.text("© 2025 Richy Entertainment. Todos los derechos reservados.", 10, 290);
+        }
+    </script>
+</body>
+</html>
