@@ -196,11 +196,11 @@
             const title = "RICHY ENTERTAINMENT";
             const titleWidth = doc.getTextWidth(title);
             const pageWidth = doc.internal.pageSize.getWidth();
-            doc.setTextColor(33, 62, 99); // Azul oscuro para el título
+            doc.setTextColor(200, 200, 200); // Azul oscuro para el título
             doc.text(title, (pageWidth - titleWidth) / 2, 45);
 
             // Sombra para el título
-            doc.setTextColor(200, 200, 200); // Sombra gris clara
+            doc.setTextColor(33, 62, 99); // Sombra gris clara
             doc.text(title, (pageWidth - titleWidth) / 2 + 0.5, 45 + 0.5);
             doc.setTextColor(33, 62, 99); // Restaurar color
 
