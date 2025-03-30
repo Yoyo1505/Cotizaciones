@@ -3,196 +3,332 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de Cotización</title>
+    <title>Generador de Cotizaciones | Richy Entertainment</title>
     <style>
+        :root {
+            --azul-marino: #002366;
+            --rojo: #d10000;
+            --blanco: #ffffff;
+            --gris-claro: #f5f5f5;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--gris-claro);
+            color: #333;
             line-height: 1.6;
         }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--blanco);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
         .header {
             display: flex;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--rojo);
         }
-        .header img {
-            margin-right: 20px;
+        
+        .logo {
+            width: 180px;
+            height: auto;
+            margin-right: 30px;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
+        
+        .titulo {
+            flex-grow: 1;
         }
-        th, td {
-            border: 1px solid #2196F3;
-            padding: 8px;
-            text-align: left;
+        
+        h1 {
+            color: var(--azul-marino);
+            margin: 0;
+            font-size: 28px;
         }
-        th {
-            background-color: #2196F3;
-            color: white;
+        
+        h2 {
+            color: var(--azul-marino);
+            border-bottom: 2px solid var(--rojo);
+            padding-bottom: 8px;
+            margin-top: 30px;
         }
-        input[type="text"], input[type="number"], input[type="email"] {
-            padding: 8px;
-            margin: 5px 0;
-            width: 200px;
+        
+        .form-section {
+            background-color: var(--gris-claro);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
         }
-        input[type="number"] {
-            width: 80px;
-        }
-        .price {
-            text-align: right;
-        }
-        button {
-            margin: 10px 0;
-            padding: 10px 15px;
-            background-color: #2196F3;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background-color: #0b7dda;
-        }
-        .remove-btn {
-            background-color: #f44336;
-            padding: 5px 10px;
-            font-size: 14px;
-        }
-        .remove-btn:hover {
-            background-color: #d32f2f;
-        }
+        
         .form-group {
             margin-bottom: 15px;
         }
-        .total-section {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #f5f5f5;
-            border-radius: 4px;
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: var(--azul-marino);
         }
-        #client-info {
-            background-color: #e3f2fd;
-            padding: 15px;
+        
+        input, select {
+            padding: 10px;
+            border: 1px solid #ddd;
             border-radius: 4px;
-            margin-bottom: 20px;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        button {
+            background-color: var(--azul-marino);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background-color: var(--rojo);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th {
+            background-color: var(--azul-marino);
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background-color: var(--gris-claro);
+        }
+        
+        .price {
+            text-align: right;
+        }
+        
+        .total-section {
+            background-color: var(--azul-marino);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .total-section label {
+            color: white;
+        }
+        
+        #total {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .remove-btn {
+            background-color: var(--rojo);
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        
+        .remove-btn:hover {
+            background-color: #b00000;
+        }
+        
+        .item-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .item-select {
+            flex-grow: 1;
+        }
+        
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #pdf-container, #pdf-container * {
+                visibility: visible;
+            }
+            #pdf-container {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <img id="logo" src="https://raw.githubusercontent.com/tu_usuario/tu_repositorio/main/logo.png" alt="Logotipo" style="width:150px;height:auto;">
-        <div>
-            <h1>Generador de Cotización</h1>
-            <p>Richy Entertainment S.A.S. de C.V.</p>
+    <div class="container">
+        <div class="header">
+            <img class="logo" src="https://raw.githubusercontent.com/Yoyo1505/Cotizaciones/main/logo.png" alt="Richy Entertainment" id="logo" onerror="this.src='logo.png'">
+            <div class="titulo">
+                <h1>Richy Entertainment</h1>
+                <p>Sistema de Generación de Cotizaciones</p>
+            </div>
         </div>
+
+        <div class="form-section">
+            <h2>Datos del Cliente</h2>
+            <div class="form-group">
+                <label for="folio-number">Número de Folio</label>
+                <input type="text" id="folio-number" placeholder="Ej: COT-2023-001">
+            </div>
+            <div class="form-group">
+                <label for="client-name">Nombre del Cliente</label>
+                <input type="text" id="client-name" placeholder="Nombre completo">
+            </div>
+            <div class="form-group">
+                <label for="client-city">Ciudad</label>
+                <input type="text" id="client-city" placeholder="Ciudad">
+            </div>
+            <div class="form-group">
+                <label for="client-phone">Teléfono</label>
+                <input type="text" id="client-phone" placeholder="Teléfono">
+            </div>
+            <div class="form-group">
+                <label for="client-email">Email</label>
+                <input type="email" id="client-email" placeholder="Email">
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2>Ítems de la Cotización</h2>
+            <div class="item-controls">
+                <select id="item-select" class="item-select">
+                    <option value="">Selecciona un ítem</option>
+                    <option value="AUTOBUS 45 PLAZAS">AUTOBUS 45 PLAZAS</option>
+                    <option value="CAMIONETA CARGA">CAMIONETA CARGA</option>
+                    <option value="CAMIONETA VAN">CAMIONETA VAN</option>
+                    <option value="COMIDAS DEL OPERADOR">COMIDAS DEL OPERADOR</option>
+                    <option value="COORDINADOR">COORDINADOR</option>
+                    <option value="DERECHOS DE PISO">DERECHOS DE PISO</option>
+                    <option value="HORAS EXTRA">HORAS EXTRA</option>
+                    <option value="HOSPEDAJE">HOSPEDAJE</option>
+                    <option value="MINIBUS 31 PLAZAS">MINIBUS 31 PLAZAS</option>
+                    <option value="PARKING">PARKING</option>
+                    <option value="SEDAN">SEDAN</option>
+                    <option value="SPRINTER">SPRINTER</option>
+                    <option value="SUBURBAN">SUBURBAN</option>
+                    <option value="SUBURBAN ADVANCE">SUBURBAN ADVANCE</option>
+                    <option value="SUBURBAN BLINDADA NIVEL 3">SUBURBAN BLINDADA NIVEL 3</option>
+                    <option value="SUBURBAN HIGH COUNTRY">SUBURBAN HIGH COUNTRY</option>
+                    <option value="TOYOTA HIACE">TOYOTA HIACE</option>
+                    <option value="TRAMO CARRETERO">TRAMO CARRETERO</option>
+                    <option value="VAN DE CARGA">VAN DE CARGA</option>
+                    <option value="VIATICOS">VIATICOS</option>
+                </select>
+                <button id="add-item-btn">Agregar Ítem</button>
+            </div>
+
+            <table id="items">
+                <thead>
+                    <tr>
+                        <th width="80px">Cantidad</th>
+                        <th>Concepto</th>
+                        <th>Vehículo/Servicio</th>
+                        <th width="120px">P. Unitario</th>
+                        <th width="120px">Total</th>
+                        <th width="100px">Acción</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div class="total-section">
+            <div class="form-group">
+                <label for="tax">Impuestos (%)</label>
+                <input type="number" id="tax" value="16" min="0" step="0.1" onchange="calculateTotal()">
+            </div>
+            <div>
+                <strong>TOTAL: <span id="total">$0.00</span></strong>
+            </div>
+        </div>
+
+        <button onclick="generatePDF()">Generar PDF</button>
+        <button onclick="window.print()" style="margin-left: 10px;">Imprimir</button>
     </div>
 
-    <div id="client-info">
-        <h2>Datos del Cliente</h2>
-        <div class="form-group">
-            <label>Número de Folio: </label>
-            <input type="text" id="folio-number" placeholder="Folio">
-        </div>
-        <div class="form-group">
-            <label>Nombre del Cliente: </label>
-            <input type="text" id="client-name" placeholder="Nombre del Cliente">
-        </div>
-        <div class="form-group">
-            <label>Ciudad: </label>
-            <input type="text" id="client-city" placeholder="Ciudad">
-        </div>
-        <div class="form-group">
-            <label>Teléfono: </label>
-            <input type="text" id="client-phone" placeholder="Teléfono">
-        </div>
-        <div class="form-group">
-            <label>Email: </label>
-            <input type="email" id="client-email" placeholder="Email">
-        </div>
-    </div>
-
-    <div>
-        <h2>Ítems de la Cotización</h2>
-        <div class="form-group">
-            <label>Agregar Ítem: </label>
-            <select id="item-select">
-                <option value="">Selecciona un ítem</option>
-            </select>
-            <button id="add-item-btn">Agregar Ítem</button>
-        </div>
-
-        <table id="items">
-            <thead>
-                <tr>
-                    <th>Cant.</th>
-                    <th>Concepto</th>
-                    <th>Vehículo/Servicio</th>
-                    <th>Precio Unitario</th>
-                    <th>Total</th>
-                    <th>Acción</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-
-    <div class="total-section">
-        <div class="form-group">
-            <label>Impuestos (%): </label>
-            <input type="number" id="tax" value="16" min="0" step="0.1" onchange="calculateTotal()">
-        </div>
-        <div>
-            <strong style="font-size: 18px;">Total: <span id="total">$0.00</span></strong>
-        </div>
-    </div>
-
-    <button onclick="downloadPDF()">Descargar PDF</button>
+    <div id="pdf-container" style="display: none;"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <script>
+        // Configuración inicial
         const { jsPDF } = window.jspdf;
+        let logoData = null;
 
-        // Configuración del logo (reemplaza con tu URL real de GitHub)
-        const logoUrl = "https://raw.githubusercontent.com/tu_usuario/tu_repositorio/main/logo.png";
-        const logoImg = new Image();
-        logoImg.crossOrigin = "Anonymous";
-        logoImg.src = logoUrl;
+        // Precargar el logo para el PDF
+        function preloadLogo() {
+            return new Promise((resolve, reject) => {
+                const logo = document.getElementById('logo');
+                const img = new Image();
+                img.crossOrigin = "Anonymous";
+                img.src = logo.src;
+                
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    logoData = canvas.toDataURL('image/png');
+                    resolve();
+                };
+                
+                img.onerror = function() {
+                    console.log("Logo no cargado, se usará texto alternativo");
+                    resolve();
+                };
+            });
+        }
 
-        const items = [
-            "AUTOBUS 45 PLAZAS", "CAMIONETA CARGA", "CAMIONETA VAN", "COMIDAS DEL OPERADOR",
-            "COMISION BANCARIA 0.5%", "COORDINADOR", "DERECHOS DE PISO", "HORAS EXTRA",
-            "HOSPEDAJE", "MINIBUS 31 PLAZAS", "PARKING", "SEDAN", "SPRINTER", "SUBURBAN",
-            "SUBURBAN ADVANCE", "SUBURBAN BLINDADA NIVEL 3", "SUBURBAN HIGH COUNTRY",
-            "SUBURBAN LINEA ANTIGUA", "TOYOTA HIACE", "TRAMO CARRETERO", "VAN DE CARGA", "VIATICOS"
-        ];
+        // Inicializar la precarga del logo
+        preloadLogo();
 
+        // Variables del sistema
         const itemsContainer = document.querySelector('#items tbody');
         const itemSelect = document.getElementById('item-select');
+        const addItemBtn = document.getElementById('add-item-btn');
 
-        // Llenar el menú desplegable con los conceptos
-        items.forEach(item => {
-            const option = document.createElement('option');
-            option.value = item;
-            option.textContent = item;
-            itemSelect.appendChild(option);
-        });
+        // Agregar evento al botón "Agregar Ítem"
+        addItemBtn.addEventListener('click', addItem);
 
-        // Agregar evento al botón "Agregar"
-        document.getElementById('add-item-btn').addEventListener('click', addItem);
-
+        // Función para agregar ítem a la cotización
         function addItem() {
             const selectedItem = itemSelect.value;
             if (selectedItem) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td><input type="number" placeholder="Cantidad" class="unit" min="1" value="1" onchange="calculateTotal()"></td>
+                    <td><input type="number" class="unit" min="1" value="1" onchange="calculateTotal()"></td>
                     <td>Servicio de Transportación Ejecutiva</td>
                     <td>${selectedItem}</td>
-                    <td><input type="number" placeholder="0.00" class="unit-price" min="0" step="0.01" onchange="calculateTotal()"></td>
+                    <td><input type="number" class="unit-price" min="0" step="0.01" value="0" onchange="calculateTotal()"></td>
                     <td class="price">$0.00</td>
                     <td><button class="remove-btn" onclick="removeItem(this)">Eliminar</button></td>
                 `;
@@ -204,188 +340,230 @@
             }
         }
 
+        // Función para eliminar ítem
         function removeItem(button) {
             const row = button.closest('tr');
             row.remove();
             calculateTotal();
         }
 
+        // Función para calcular totales
         function calculateTotal() {
             let subtotal = 0;
             const rows = document.querySelectorAll('#items tbody tr');
+            
             rows.forEach(row => {
-                const unitInput = parseFloat(row.querySelector('.unit').value) || 0;
-                const unitPriceInput = parseFloat(row.querySelector('.unit-price').value) || 0;
-                const priceCell = row.querySelector('.price');
-                const price = unitInput * unitPriceInput;
-                priceCell.textContent = `$${price.toFixed(2)}`;
-                subtotal += price;
+                const unit = parseFloat(row.querySelector('.unit').value) || 0;
+                const unitPrice = parseFloat(row.querySelector('.unit-price').value) || 0;
+                const total = unit * unitPrice;
+                row.querySelector('.price').textContent = `$${total.toFixed(2)}`;
+                subtotal += total;
             });
             
             const taxRate = parseFloat(document.getElementById('tax').value) || 0;
             const taxAmount = subtotal * (taxRate / 100);
             const total = subtotal + taxAmount;
             
-            document.getElementById('total').innerText = `$${total.toFixed(2)}`;
+            document.getElementById('total').textContent = `$${total.toFixed(2)}`;
         }
 
-        async function downloadPDF() {
-            const doc = new jsPDF();
+        // Función para generar el PDF
+        async function generatePDF() {
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
             
-            // Agregar logo al PDF
-            try {
-                // Crear una nueva imagen para el PDF
-                const pdfLogo = new Image();
-                pdfLogo.crossOrigin = "Anonymous";
-                pdfLogo.src = logoUrl;
-                
-                // Esperar a que la imagen se cargue
-                await new Promise((resolve, reject) => {
-                    pdfLogo.onload = resolve;
-                    pdfLogo.onerror = () => {
-                        console.error("Error al cargar el logo");
-                        resolve(); // Continuar incluso si falla
-                    };
-                });
-                
-                // Convertir la imagen a base64
-                const canvas = document.createElement('canvas');
-                canvas.width = pdfLogo.width;
-                canvas.height = pdfLogo.height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(pdfLogo, 0, 0);
-                const logoData = canvas.toDataURL('image/png');
-                
-                // Agregar la imagen al PDF (centrada, con buen tamaño)
-                const pageWidth = doc.internal.pageSize.getWidth();
-                const logoWidth = 50; // Ancho del logo en el PDF (ajustable)
-                const logoHeight = (pdfLogo.height / pdfLogo.width) * logoWidth;
-                doc.addImage(logoData, 'PNG', (pageWidth - logoWidth) / 2, 15, logoWidth, logoHeight);
-                
-            } catch (error) {
-                console.error("Error al cargar el logo:", error);
-                // Si falla, agregamos texto alternativo
-                doc.setFontSize(16);
-                doc.setTextColor(33, 62, 99);
-                doc.text("RICHY ENTERTAINMENT", 105, 30, { align: 'center' });
+            // Margenes del documento
+            const marginLeft = 15;
+            const marginRight = 15;
+            const pageWidth = doc.internal.pageSize.getWidth() - marginLeft - marginRight;
+            
+            // Agregar logo al PDF si está cargado
+            let logoHeight = 0;
+            if (logoData) {
+                const logoWidth = 50;
+                logoHeight = (document.getElementById('logo').naturalHeight / document.getElementById('logo').naturalWidth) * logoWidth;
+                doc.addImage(logoData, 'PNG', (doc.internal.pageSize.getWidth() - logoWidth) / 2, 15, logoWidth, logoHeight);
+            } else {
+                doc.setFontSize(20);
+                doc.setTextColor(0, 35, 102);
+                doc.text("Richy Entertainment", doc.internal.pageSize.getWidth() / 2, 30, { align: 'center' });
             }
-
-            // Datos del cliente
-            const folio = document.getElementById('folio-number').value || 'Sin Folio';
-            const clientName = document.getElementById('client-name').value || 'Nombre del Cliente';
-            const clientCity = document.getElementById('client-city').value || 'Ciudad';
-            const clientPhone = document.getElementById('client-phone').value || 'Teléfono';
-            const clientEmail = document.getElementById('client-email').value || 'Email';
-            const currentDate = new Date().toLocaleDateString('es-MX', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
+            
+            // Datos de la cotización
+            const folio = document.getElementById('folio-number').value || 'Sin folio';
+            const date = new Date().toLocaleDateString('es-MX', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
             });
             
             // Encabezado
             doc.setFontSize(10);
             doc.setTextColor(100, 100, 100);
-            doc.text(`Fecha: ${currentDate}`, 14, 40);
-            doc.text(`Folio: ${folio}`, 160, 40);
+            doc.text(`Fecha: ${date}`, marginLeft, 30 + logoHeight);
+            doc.text(`Folio: ${folio}`, doc.internal.pageSize.getWidth() - marginRight, 30 + logoHeight, { align: 'right' });
             
-            // Información del cliente
-            doc.setFontSize(12);
-            doc.setFont("helvetica", "bold");
-            doc.setTextColor(33, 62, 99);
-            doc.text("DATOS DEL CLIENTE", 14, 60);
+            doc.setFontSize(16);
+            doc.setTextColor(0, 35, 102);
+            doc.text("COTIZACIÓN", doc.internal.pageSize.getWidth() / 2, 45 + logoHeight, { align: 'center' });
             
-            doc.setFont("helvetica", "normal");
-            doc.text(`Nombre: ${clientName}`, 14, 70);
-            doc.text(`Ciudad: ${clientCity}`, 14, 80);
-            doc.text(`Teléfono: ${clientPhone}`, 14, 90);
-            doc.text(`Email: ${clientEmail}`, 14, 100);
-            
-            // Línea separadora
-            doc.setDrawColor(33, 62, 99);
+            // Línea decorativa
+            doc.setDrawColor(209, 0, 0);
             doc.setLineWidth(0.5);
-            doc.line(14, 105, 196, 105);
+            doc.line(marginLeft, 50 + logoHeight, doc.internal.pageSize.getWidth() - marginRight, 50 + logoHeight);
             
-            // Título de la tabla
-            doc.setFontSize(14);
-            doc.setFont("helvetica", "bold");
-            doc.text("DETALLE DE LA COTIZACIÓN", 14, 115);
+            // Datos del cliente
+            doc.setFontSize(12);
+            doc.setTextColor(0, 35, 102);
+            doc.text("DATOS DEL CLIENTE", marginLeft, 60 + logoHeight);
             
-            // Tabla de items
+            const clientName = document.getElementById('client-name').value || 'No especificado';
+            const clientCity = document.getElementById('client-city').value || 'No especificado';
+            const clientPhone = document.getElementById('client-phone').value || 'No especificado';
+            const clientEmail = document.getElementById('client-email').value || 'No especificado';
+            
+            doc.setFontSize(10);
+            doc.setTextColor(50, 50, 50);
+            doc.text(`Nombre: ${clientName}`, marginLeft, 70 + logoHeight);
+            doc.text(`Ciudad: ${clientCity}`, marginLeft, 80 + logoHeight);
+            doc.text(`Teléfono: ${clientPhone}`, marginLeft, 90 + logoHeight);
+            doc.text(`Email: ${clientEmail}`, marginLeft, 100 + logoHeight);
+            
+            // Tabla de ítems
             const tableData = [];
             const rows = document.querySelectorAll('#items tbody tr');
+            
             rows.forEach(row => {
-                const unit = row.querySelector('.unit').value || '1';
-                const concept = row.cells[1].textContent;
-                const vehicle = row.cells[2].textContent;
+                const quantity = row.querySelector('.unit').value || '1';
+                const concept = 'Servicio de Transportación Ejecutiva';
+                const item = row.cells[2].textContent;
                 const unitPrice = parseFloat(row.querySelector('.unit-price').value) || 0;
-                const price = parseFloat(row.querySelector('.price').textContent.replace('$', '')) || 0;
+                const total = parseFloat(row.querySelector('.price').textContent.replace('$', '')) || 0;
+                
                 tableData.push([
-                    unit,
+                    quantity,
                     concept,
-                    vehicle,
+                    item,
                     `$${unitPrice.toFixed(2)}`,
-                    `$${price.toFixed(2)}`
+                    `$${total.toFixed(2)}`
                 ]);
             });
             
             doc.autoTable({
-                head: [['Cant.', 'Concepto', 'Vehículo/Servicio', 'P. Unitario', 'Total']],
+                head: [['Cant.', 'Concepto', 'Descripción', 'P. Unitario', 'Total']],
                 body: tableData,
-                startY: 120,
-                theme: 'grid',
+                startY: 110 + logoHeight,
                 headStyles: {
-                    fillColor: [33, 62, 99],
+                    fillColor: [0, 35, 102],
                     textColor: [255, 255, 255],
-                    fontSize: 10,
-                    fontStyle: 'bold'
+                    fontSize: 9,
+                    fontStyle: 'bold',
+                    halign: 'center'
                 },
                 bodyStyles: {
-                    fontSize: 9
+                    fontSize: 8,
+                    textColor: [50, 50, 50]
                 },
                 columnStyles: {
                     0: { cellWidth: 15, halign: 'center' },
-                    1: { cellWidth: 50 },
-                    2: { cellWidth: 45 },
+                    1: { cellWidth: 40, halign: 'left' },
+                    2: { cellWidth: 60, halign: 'left' },
                     3: { cellWidth: 30, halign: 'right' },
                     4: { cellWidth: 30, halign: 'right' }
                 },
-                margin: { left: 14, right: 14 }
+                margin: { left: marginLeft, right: marginRight },
+                styles: {
+                    cellPadding: 3,
+                    lineWidth: 0.1,
+                    lineColor: [200, 200, 200]
+                },
+                alternateRowStyles: {
+                    fillColor: [245, 245, 245]
+                }
             });
             
             // Totales
-            const yPosition = doc.lastAutoTable.finalY + 10;
+            const finalY = doc.lastAutoTable.finalY + 10;
             const taxRate = parseFloat(document.getElementById('tax').value) || 0;
             const totalText = document.getElementById('total').textContent;
             const total = parseFloat(totalText.replace('$', '')) || 0;
             const subtotal = total / (1 + taxRate/100);
             const taxAmount = total - subtotal;
             
+            // Fondo azul para la sección de totales
+            doc.setFillColor(0, 35, 102);
+            doc.rect(marginLeft, finalY, pageWidth, 30, 'F');
+            
             doc.setFontSize(12);
-            doc.setFont("helvetica", "bold");
-            doc.text("RESUMEN DE PAGO", 14, yPosition);
+            doc.setTextColor(255, 255, 255);
+            doc.text("RESUMEN DE PAGO", marginLeft + 5, finalY + 10);
             
-            doc.setFont("helvetica", "normal");
-            doc.text(`Subtotal:`, 150, yPosition);
-            doc.text(`$${subtotal.toFixed(2)}`, 180, yPosition, { align: 'right' });
+            doc.setFontSize(10);
+            doc.text(`Subtotal:`, marginLeft + pageWidth - 60, finalY + 5);
+            doc.text(`$${subtotal.toFixed(2)}`, marginLeft + pageWidth - 10, finalY + 5, { align: 'right' });
             
-            doc.text(`Impuestos (${taxRate}%):`, 150, yPosition + 10);
-            doc.text(`$${taxAmount.toFixed(2)}`, 180, yPosition + 10, { align: 'right' });
+            doc.text(`Impuestos (${taxRate}%):`, marginLeft + pageWidth - 60, finalY + 15);
+            doc.text(`$${taxAmount.toFixed(2)}`, marginLeft + pageWidth - 10, finalY + 15, { align: 'right' });
             
-            doc.setFontSize(14);
-            doc.setFont("helvetica", "bold");
-            doc.text(`Total:`, 150, yPosition + 20);
-            doc.text(`$${total.toFixed(2)}`, 180, yPosition + 20, { align: 'right' });
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text(`Total:`, marginLeft + pageWidth - 60, finalY + 25);
+            doc.text(`${totalText}`, marginLeft + pageWidth - 10, finalY + 25, { align: 'right' });
+            
+            // Datos del vendedor (debajo de la tabla)
+            const sellerY = finalY + 40;
+            doc.setFillColor(245, 245, 245);
+            doc.rect(marginLeft, sellerY, pageWidth, 40, 'F');
+            doc.setDrawColor(200, 200, 200);
+            doc.rect(marginLeft, sellerY, pageWidth, 40);
+            
+            doc.setFontSize(12);
+            doc.setTextColor(0, 35, 102);
+            doc.text("DATOS DEL VENDEDOR", marginLeft + 5, sellerY + 10);
+            
+            doc.setFontSize(10);
+            doc.setTextColor(50, 50, 50);
+            doc.text("Richy Entertainment S.A.S. de C.V.", marginLeft + 5, sellerY + 20);
+            doc.text("Teléfono: 52 55 7341 3969", marginLeft + 5, sellerY + 25);
+            doc.text("Email: transpo_rick@hotmail.com", marginLeft + 5, sellerY + 30);
+            
+            // Información bancaria
+            doc.text("Banco: Santander", marginLeft + pageWidth/2, sellerY + 20);
+            doc.text("Cuenta: 65-51041870-7", marginLeft + pageWidth/2, sellerY + 25);
+            doc.text("CLABE: 014180655104187070", marginLeft + pageWidth/2, sellerY + 30);
             
             // Pie de página
-            doc.setFontSize(10);
+            doc.setFontSize(8);
             doc.setTextColor(100, 100, 100);
-            doc.text("Richy Entertainment S.A.S. de C.V.", 14, 280);
-            doc.text("Tel: 52 55 7341 3969 | Email: transpo_rick@hotmail.com", 14, 285);
-            doc.text("© 2025 Richy Entertainment. Todos los derechos reservados.", 105, 285, { align: 'center' });
+            doc.text("© 2025 Richy Entertainment - Todos los derechos reservados", doc.internal.pageSize.getWidth() / 2, 287, { align: 'center' });
             
-            // Guardar PDF
+            // Crear vista previa para impresión
+            createPrintPreview(doc);
+            
+            // Guardar el PDF
             const fileName = `Cotización_${folio}_${clientName.replace(/[^a-z0-9]/gi, '_')}.pdf`;
             doc.save(fileName);
+        }
+
+        // Crear vista previa para impresión
+        function createPrintPreview(pdf) {
+            const pdfContainer = document.getElementById('pdf-container');
+            pdfContainer.innerHTML = '';
+            
+            // Crear iframe para visualizar el PDF
+            const iframe = document.createElement('iframe');
+            iframe.style.width = '100%';
+            iframe.style.height = '800px';
+            iframe.style.border = 'none';
+            
+            pdfContainer.appendChild(iframe);
+            
+            // Mostrar el PDF en el iframe
+            iframe.src = pdf.output('datauristring');
+            pdfContainer.style.display = 'block';
         }
 
         // Inicializar cálculos
