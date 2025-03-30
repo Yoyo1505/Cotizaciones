@@ -44,258 +44,66 @@
 </head>
 <body>
     <h1>Generador de Cotización</h1>
-    <img id="logo" src="logo.png" alt="Logotipo" style="width:150px;height:auto;">
+    <img id="logo" src="https://raw.githubusercontent.com/tu_usuario/tu_repositorio/main/logo.png" alt="Logotipo" style="width:150px;height:auto;">
 
-    <!-- Datos del cliente con folio -->
-    <div>
-        <label>Número de Folio: <input type="text" id="folio-number" placeholder="Folio"></label><br>
-        <label>Nombre del Cliente: <input type="text" id="client-name" placeholder="Nombre del Cliente"></label><br>
-        <label>Ciudad: <input type="text" id="client-city" placeholder="Ciudad"></label><br>
-        <label>Teléfono: <input type="text" id="client-phone" placeholder="Teléfono"></label><br>
-        <label>Email: <input type="text" id="client-email" placeholder="Email"></label><br>
-    </div>
+    <!-- Resto del formulario... (igual que antes) -->
 
-    <!-- Selección de ítems -->
-    <div>
-        <label>Agregar Ítem: 
-            <select id="item-select">
-                <option value="">Selecciona un ítem</option>
-            </select>
-        </label>
-        <button id="add-item-btn">Agregar</button>
-    </div>
-
-    <!-- Tabla de ítems -->
-    <table id="items">
-        <thead>
-            <tr>
-                <th>Unidad</th>
-                <th>Concepto</th>
-                <th>Vehículo</th>
-                <th>P.U.</th>
-                <th>Precio</th>
-                <th>Acción</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-
-    <!-- Impuestos y total -->
-    <div>
-        <label>Impuestos (%): <input type="number" id="tax" value="0" min="0" onchange="calculateTotal()"></label><br>
-        <strong>Total: <span id="total">$0.00</span></strong>
-    </div>
-
-    <!-- Botón para descargar PDF -->
-    <button onclick="downloadPDF()">Descargar PDF</button>
-
-    <!-- Incluir jsPDF y autoTable -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <script>
         const { jsPDF } = window.jspdf;
 
-        const items = [
-            "AUTOBUS 45 PLAZAS", "CAMIONETA CARGA", "CAMIONETA VAN", "COMIDAS DEL OPERADOR",
-            "COMISION BANCARIA 0.5%", "COORDINADOR", "DERECHOS DE PISO", "HORAS EXTRA",
-            "HOSPEDAJE", "MINIBUS 31 PLAZAS", "PARKING", "SEDAN", "SPRINTER", "SUBURBAN",
-            "SUBURBAN ADVANCE", "SUBURBAN BLINDADA NIVEL 3", "SUBURBAN HIGW COUNTRY",
-            "SUBURBAN LINEA ANTIGUA", "TOYOTA HIENCE", "TRAMO CARRETERO", "VAN DE CARGA", "VIATICOS"
-        ];
+        // Configuración del logo
+        const logoUrl = "https://raw.githubusercontent.com/tu_usuario/tu_repositorio/main/logo.png";
+        const logoImg = new Image();
+        logoImg.crossOrigin = "Anonymous";
+        logoImg.src = logoUrl;
+        document.getElementById('logo').src = logoUrl;
 
-        const itemsContainer = document.querySelector('#items tbody');
-        const itemSelect = document.getElementById('item-select');
-
-        // Llenar el menú desplegable con los conceptos
-        items.forEach(item => {
-            const option = document.createElement('option');
-            option.value = item;
-            option.textContent = item;
-            itemSelect.appendChild(option);
-        });
-
-        // Agregar evento al botón "Agregar"
-        document.getElementById('add-item-btn').addEventListener('click', addItem);
-
-        function addItem() {
-            const selectedItem = itemSelect.value;
-            if (selectedItem) {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><input type="number" placeholder="Cantidad" class="unit" min="1" value="1" onchange="calculateTotal()"></td>
-                    <td>Servicio de Transportación Ejecutiva</td>
-                    <td>${selectedItem}</td>
-                    <td><input type="number" placeholder="P.U." class="unit-price" min="0" step="0.01" onchange="calculateTotal()"></td>
-                    <td class="price">$0.00</td>
-                    <td><button class="remove-btn" onclick="removeItem(this)">Eliminar</button></td>
-                `;
-                itemsContainer.appendChild(row);
-                itemSelect.value = '';
-                calculateTotal();
-            } else {
-                alert('Por favor, selecciona un ítem antes de agregar.');
-            }
-        }
-
-        function removeItem(button) {
-            const row = button.closest('tr');
-            row.remove();
-            calculateTotal();
-        }
-
-        function calculateTotal() {
-            let subtotal = 0;
-            const rows = document.querySelectorAll('#items tbody tr');
-            rows.forEach(row => {
-                const unitInput = parseFloat(row.querySelector('.unit').value) || 0;
-                const unitPriceInput = parseFloat(row.querySelector('.unit-price').value) || 0;
-                const priceCell = row.querySelector('.price');
-                const price = unitInput * unitPriceInput;
-                priceCell.textContent = `$${price.toFixed(2)}`;
-                subtotal += price;
-            });
-            
-            const taxRate = parseFloat(document.getElementById('tax').value) || 0;
-            const taxAmount = subtotal * (taxRate / 100);
-            const total = subtotal + taxAmount;
-            
-            document.getElementById('total').innerText = `$${total.toFixed(2)}`;
-        }
+        // Resto de tus funciones...
 
         async function downloadPDF() {
             const doc = new jsPDF();
             
             // Agregar logo al PDF
             try {
-                const logo = document.getElementById('logo');
-                const logoData = await getImageData(logo);
+                // Crear una nueva imagen para el PDF
+                const pdfLogo = new Image();
+                pdfLogo.crossOrigin = "Anonymous";
+                pdfLogo.src = logoUrl;
+                
+                // Esperar a que la imagen se cargue
+                await new Promise((resolve, reject) => {
+                    pdfLogo.onload = resolve;
+                    pdfLogo.onerror = reject;
+                });
+                
+                // Convertir la imagen a base64
+                const canvas = document.createElement('canvas');
+                canvas.width = pdfLogo.width;
+                canvas.height = pdfLogo.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(pdfLogo, 0, 0);
+                const logoData = canvas.toDataURL('image/png');
+                
+                // Agregar la imagen al PDF (centrada, con buen tamaño)
                 const pageWidth = doc.internal.pageSize.getWidth();
-                const logoWidth = 40;
-                const logoHeight = (logo.naturalHeight / logo.naturalWidth) * logoWidth;
-                doc.addImage(logoData, 'PNG', (pageWidth - logoWidth) / 2, 10, logoWidth, logoHeight);
+                const logoWidth = 50; // Ancho del logo en el PDF
+                const logoHeight = (pdfLogo.height / pdfLogo.width) * logoWidth;
+                doc.addImage(logoData, 'PNG', (pageWidth - logoWidth) / 2, 15, logoWidth, logoHeight);
+                
             } catch (error) {
                 console.error("Error al cargar el logo:", error);
+                // Si falla, podemos agregar texto alternativo
+                doc.setFontSize(16);
+                doc.setTextColor(33, 62, 99);
+                doc.text("RICHY ENTERTAINMENT", 105, 30, { align: 'center' });
             }
 
-            // Datos del cliente
-            const folio = document.getElementById('folio-number').value || 'Sin Folio';
-            const clientName = document.getElementById('client-name').value || 'Nombre del Cliente';
-            const clientCity = document.getElementById('client-city').value || 'Ciudad';
-            const clientPhone = document.getElementById('client-phone').value || 'Teléfono';
-            const clientEmail = document.getElementById('client-email').value || 'Email';
-            const currentDate = new Date().toLocaleDateString('es-MX');
+            // Resto de la generación del PDF... (igual que antes)
             
-            // Encabezado
-            doc.setFontSize(10);
-            doc.setTextColor(100, 100, 100);
-            doc.text(`Fecha: ${currentDate}`, 14, 20);
-            doc.text(`Folio: ${folio}`, 160, 20);
-            
-            // Título
-            doc.setFontSize(16);
-            doc.setFont("helvetica", "bold");
-            doc.setTextColor(33, 62, 99);
-            doc.text("COTIZACIÓN", 105, 40, { align: 'center' });
-            
-            // Línea decorativa
-            doc.setDrawColor(33, 62, 99);
-            doc.setLineWidth(0.5);
-            doc.line(14, 45, 196, 45);
-            
-            // Datos del cliente
-            doc.setFontSize(12);
-            doc.setFont("helvetica", "bold");
-            doc.text("Cliente:", 14, 60);
-            doc.setFont("helvetica", "normal");
-            doc.text(clientName, 30, 60);
-            doc.text(`Ciudad: ${clientCity}`, 14, 70);
-            doc.text(`Teléfono: ${clientPhone}`, 14, 80);
-            doc.text(`Email: ${clientEmail}`, 14, 90);
-            
-            // Tabla de items
-            const tableData = [];
-            const rows = document.querySelectorAll('#items tbody tr');
-            rows.forEach(row => {
-                const unit = row.querySelector('.unit').value || '1';
-                const concept = 'Servicio de Transportación Ejecutiva';
-                const vehicle = row.cells[2].textContent;
-                const unitPrice = row.querySelector('.unit-price').value || '0';
-                const price = row.querySelector('.price').textContent || '$0.00';
-                tableData.push([unit, concept, vehicle, `$${parseFloat(unitPrice).toFixed(2)}`, price]);
-            });
-            
-            doc.autoTable({
-                head: [['Cant.', 'Concepto', 'Vehículo', 'P.U.', 'Total']],
-                body: tableData,
-                startY: 100,
-                theme: 'grid',
-                headStyles: {
-                    fillColor: [33, 62, 99],
-                    textColor: [255, 255, 255],
-                    fontSize: 10,
-                    fontStyle: 'bold'
-                },
-                bodyStyles: {
-                    fontSize: 9
-                },
-                columnStyles: {
-                    0: { cellWidth: 15, halign: 'center' },
-                    1: { cellWidth: 60 },
-                    2: { cellWidth: 50 },
-                    3: { cellWidth: 25, halign: 'right' },
-                    4: { cellWidth: 25, halign: 'right' }
-                },
-                margin: { left: 14, right: 14 }
-            });
-            
-            // Totales
-            const yPosition = doc.lastAutoTable.finalY + 10;
-            const taxRate = document.getElementById('tax').value || 0;
-            const total = document.getElementById('total').textContent;
-            
-            doc.setFontSize(12);
-            doc.setFont("helvetica", "bold");
-            doc.text(`Subtotal: $${(parseFloat(total.replace('$', '')) / (1 + parseFloat(taxRate)/100).toFixed(2)}`, 150, yPosition);
-            doc.text(`Impuestos (${taxRate}%): $${(parseFloat(total.replace('$', '')) - (parseFloat(total.replace('$', '')) / (1 + parseFloat(taxRate)/100)).toFixed(2)}`, 150, yPosition + 10);
-            doc.text(`Total: ${total}`, 150, yPosition + 20);
-            
-            // Pie de página
-            doc.setFontSize(10);
-            doc.setTextColor(100, 100, 100);
-            doc.text("Richy Entertainment S.A.S. de C.V.", 14, 280);
-            doc.text("Tel: 52 55 7341 3969 | Email: transpo_rick@hotmail.com", 14, 285);
-            doc.text("© 2025 Richy Entertainment. Todos los derechos reservados.", 105, 285, { align: 'center' });
-            
-            // Guardar PDF
             doc.save(`Cotización_${folio}_${clientName.replace(/ /g, '_')}.pdf`);
         }
 
-        function getImageData(imgElement) {
-            return new Promise((resolve, reject) => {
-                // Si la imagen ya está cargada
-                if (imgElement.complete && imgElement.naturalWidth !== 0) {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = imgElement.naturalWidth;
-                    canvas.height = imgElement.naturalHeight;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(imgElement, 0, 0);
-                    resolve(canvas.toDataURL('image/png'));
-                } else {
-                    // Esperar a que la imagen se cargue
-                    imgElement.onload = function() {
-                        const canvas = document.createElement('canvas');
-                        canvas.width = imgElement.naturalWidth;
-                        canvas.height = imgElement.naturalHeight;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(imgElement, 0, 0);
-                        resolve(canvas.toDataURL('image/png'));
-                    };
-                    imgElement.onerror = function() {
-                        reject(new Error("Error al cargar la imagen"));
-                    };
-                }
-            });
-        }
+        // Resto del código...
     </script>
 </body>
 </html>
